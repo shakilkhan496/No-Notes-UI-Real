@@ -3,6 +3,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import './App.css'; 
 import { initializeApp } from 'firebase/app';
 import { getFunctions, httpsCallable }  from 'firebase/functions';
+import { getAuth, signInWithRedirect, signOut, GoogleAuthProvider, onAuthStateChanged } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyB0YAFU4WQ7ex8uJ0e1Sw2l68IC4tjzwWQ",
@@ -18,15 +19,18 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const functions = getFunctions(app);
 
+const provider = new GoogleAuthProvider();
+const auth = getAuth();
+
 
 function App() {
   const [firstTextboxValue, setFirstTextboxValue] = useState('55 year old with back pain');
   const [secondTextboxValue, setSecondTextboxValue] = useState('');
+  const [userValue, setUserValue] = useState(null);
   const [loading, setLoading] = useState(false);
   const textareaRef = useRef(null);
 
   useEffect(() => {
-    // Automatically adjust the height of the textarea to fit its content
     const adjustHeight = () => {
       if (textareaRef.current) {
         textareaRef.current.style.height = 'inherit'; // Reset height to recalculate
@@ -34,8 +38,38 @@ function App() {
       }
     };
 
-    adjustHeight(); // Adjust height on component mount and when secondTextboxValue changes
+    adjustHeight(); 
   }, [secondTextboxValue]);
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const uid = user.uid;
+        setUserValue(user)
+        console.log("user signed in: ", user, "done.")
+      } else {
+        setUserValue(null)
+        console.log("user signed out: ", user, "done.")
+      }
+    });
+  }, []);
+
+  
+
+  const handleSignIn = () => {
+    signInWithRedirect(auth, provider)
+  }
+
+  const handleSignOut = () => {
+    signOut(auth).then(() => {
+      // Sign-out successful.
+      // setIsSignedIn(false)
+      setUserValue(null)
+    }).catch((error) => {
+      // An error happened.
+      console.log("couldnt sign out")
+    });
+  }
 
   const handleClick = async () => {
     console.log("Initialized the webapp")
@@ -60,18 +94,30 @@ function App() {
 
   return (
     <div className="App">
+      {userValue ? 
+        <>
+          <h4>Hi {userValue.displayName}!</h4>
+          <button className="" onClick={handleSignOut}>
+            <span>Sign Out</span>
+          </button>
+        </>  :
+        <button className="" onClick={handleSignIn}>
+          <span>Sign In</span>
+        </button>
+      }
+      
       <div className="input-container">
-        <h2>Assessment</h2>
+        <h2>Brief Case Description</h2>
         <input
           type="text"
-          placeholder="Give us a short description of your assessment."
+          placeholder="Give us a short description of your Case Description."
           className="text-input"
           value={firstTextboxValue}
           onChange={(e) => setFirstTextboxValue(e.target.value)}
         />
       </div>
       <div className="input-container">
-        <h2>S.O.A.P Note</h2>
+        <h2>Your Full Evaluation</h2>
         <textarea
           placeholder="We'll handle this part!"
           disabled={secondTextboxValue.length === 0}
@@ -89,9 +135,14 @@ function App() {
         loading={loading}
         variant="contained"
         color="success"
-        disabled={loading}
-        >
-        <span>Let the machine do the work</span>
+        disabled={loading || userValue === null || firstTextboxValue.length === 0}>
+        <span>
+          { userValue === null || firstTextboxValue.length === 0 ?
+            firstTextboxValue.length === 0 ? "Describe your case!" : "Sign in"
+           : "Let the machine do the work"
+          }
+            
+        </span>
       </LoadingButton>
       {
         loading ? 
