@@ -1,38 +1,36 @@
 .App {
   text-align: center;
+  padding: 20px;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.input-container, .button-container {
+  margin: 20px auto;
+  width: 90%; /* Responsive width */
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.text-input, .submit-button {
+  width: 100%; /* Makes input/button take full width of its container */
+  padding: 10px; /* Adds some padding inside */
+  margin-top: 5px; /* Adds some space above */
+  box-sizing: border-box; /* Ensures padding does not affect the overall width */
+  border: 1px solid #ccc; /* Adds a light border */
+  border-radius: 4px; /* Rounds the corners */
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.submit-button {
+  background-color: #4CAF50; /* Green background */
+  color: white; /* White text color */
+  font-size: 16px; /* Slightly larger font */
+  cursor: pointer; /* Changes cursor to indicate clickability */
+  border: none; /* Removes the default border */
 }
 
-.App-link {
-  color: #61dafb;
+.submit-button:hover {
+  background-color: #45a049; /* Darker shade on hover */
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
+@media (min-width: 600px) {
+  .input-container, .button-container {
+    width: 80%; /* On larger screens, reduce the width to make it look better */
   }
 }
