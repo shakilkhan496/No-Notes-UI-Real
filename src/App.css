@@ -3,6 +3,10 @@
   padding: 20px;
 }
 
+.buttons {
+ 
+}
+
 .input-container, .button-container {
   margin: 20px auto;
   width: 90%; /* Responsive width */

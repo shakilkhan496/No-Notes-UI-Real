@@ -42,18 +42,24 @@ function App() {
   }, [secondTextboxValue]);
 
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        const uid = user.uid;
-        setUserValue(user)
-        console.log("user signed in: ", user, "done.")
-      } else {
-        setUserValue(null)
-        console.log("user signed out: ", user, "done.")
-      }
-    });
+    // setUserValue(auth.currentUser);
   }, []);
 
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const uid = user.uid;
+        setUserValue(user);
+        console.log("user signed in: ", user, "done.");
+      } else {
+        setUserValue(null);
+        console.log("user signed out: ", user, "done.");
+      }
+    });
+  
+    // Cleanup function to unsubscribe from the listener when the component unmounts
+    return () => unsubscribe();
+  }, []);
   
 
   const handleSignIn = () => {
@@ -71,12 +77,20 @@ function App() {
     });
   }
 
+  const handleStripePurchase = () => {
+
+  }
+
+  const handleStripeView = () => {
+
+  }
+
   const handleClick = async () => {
     console.log("Initialized the webapp")
 
     setLoading(true);
 
-    const goodbyeWorld = httpsCallable(functions, 'goodbyeWorld');
+    const goodbyeWorld = httpsCallable(functions, 'goodbyePain');
     goodbyeWorld({ prompt: firstTextboxValue })
       .then((result) => {
         /** @type {any} */
@@ -94,6 +108,7 @@ function App() {
 
   return (
     <div className="App">
+      <div className="buttons">
       {userValue ? 
         <>
           <h4>Hi {userValue.displayName}!</h4>
@@ -105,6 +120,18 @@ function App() {
           <span>Sign In</span>
         </button>
       }
+      {userValue ? 
+        <>
+          <button className="" onClick={handleStripeView}>
+            <span>View Membership</span>
+          </button>
+        </>  :
+        <button className="" onClick={handleStripePurchase}>
+          <span>Buy Membership</span>
+        </button>
+      }
+      </div>
+      
       
       <div className="input-container">
         <h2>Brief Case Description</h2>
