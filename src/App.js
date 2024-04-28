@@ -4,6 +4,9 @@ import './App.css';
 import { initializeApp } from 'firebase/app';
 import { getFunctions, httpsCallable }  from 'firebase/functions';
 import { getAuth, signInWithRedirect, signOut, GoogleAuthProvider, onAuthStateChanged } from "firebase/auth";
+import { getFirestore, addDoc, collection } from "firebase/firestore";
+import { createCheckoutSession, getStripePayments } from "@stripe/firestore-stripe-payments";
+// import { getProducts } from "@invertase/firestore-stripe-payments";
 
 const firebaseConfig = {
   apiKey: "AIzaSyB0YAFU4WQ7ex8uJ0e1Sw2l68IC4tjzwWQ",
@@ -18,6 +21,12 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const functions = getFunctions(app);
+const db = getFirestore(app);
+const payments = getStripePayments(app, {
+  productsCollection: "products",
+  customersCollection: "customers",
+});
+
 
 const provider = new GoogleAuthProvider();
 const auth = getAuth();
@@ -48,7 +57,7 @@ function App() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        const uid = user.uid;
+        // const uid = user.uid;
         setUserValue(user);
         console.log("user signed in: ", user, "done.");
       } else {
@@ -77,12 +86,58 @@ function App() {
     });
   }
 
-  const handleStripePurchase = () => {
+  const handleStripePurchase = async () => {
+    // const session = await createCheckoutSession(payments, {
+    //   price: "price_1Or8nfCxklo4kZkVc4VoNPld",
+    // });
+    window.location.assign("https://buy.stripe.com/test_4gw6qw1GAbWc6R2288");// https://buy.stripe.com/bIYbKm36Ud4I6Ri288")//session.url);
+    // const products = await getProducts(payments, {
+    //   includePrices: true,
+    //   activeOnly: true,
+    // });
+    
+    // console.log("Listing products")
+    // for (const product of products) {
+    //   console.log("product: ", product);
+    // }
 
+    // =========================================================
+    // try {
+    //   const docRef = await addDoc(collection(db, "users"), {
+    //     first: "Alan",
+    //     middle: "Mathison",
+    //     last: "Turing",
+    //     born: 1912
+    //   });
+    
+    //   console.log("Document written with ID: ", docRef.id);
+    // } catch (e) {
+    //   console.error("Error adding document: ", e);
+    // }
   }
 
-  const handleStripeView = () => {
-
+  const handleStripeView = async () => {
+    try {
+      const docRef = await addDoc(collection(db, "users"), {
+        first: "Alan",
+        middle: "Mathison",
+        last: "Turing",
+        born: 1912
+      });
+    
+      console.log("Document written with ID: ", docRef.id);
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
+    // const docRef = await db
+    //   .collection('customers')
+    //   .doc(userValue.uid)
+    //   .collection('checkout_sessions')
+    //   .add({
+    //     price: 'price_1GqIC8HYgolSBA35zoTTN2Zl',
+    //     success_url: window.location.origin,
+    //     cancel_url: window.location.origin,
+    //   });
   }
 
   const handleClick = async () => {
@@ -109,27 +164,27 @@ function App() {
   return (
     <div className="App">
       <div className="buttons">
-      {userValue ? 
-        <>
-          <h4>Hi {userValue.displayName}!</h4>
-          <button className="" onClick={handleSignOut}>
-            <span>Sign Out</span>
+        {userValue ? 
+          <>
+            <h4>Hi {userValue.displayName}!</h4>
+            <button className="" onClick={handleSignOut}>
+              <span>Sign Out</span>
+            </button>
+          </>  :
+          <button className="" onClick={handleSignIn}>
+            <span>Sign In</span>
           </button>
-        </>  :
-        <button className="" onClick={handleSignIn}>
-          <span>Sign In</span>
-        </button>
-      }
-      {userValue ? 
-        <>
-          <button className="" onClick={handleStripeView}>
-            <span>View Membership</span>
+        }
+        {userValue ? 
+          <>
+            <button className="" style={{marginLeft: 10}} onClick={handleStripePurchase}>
+              <span>View Membership</span>
+            </button>
+          </>  :
+          <button className="" onClick={handleStripePurchase}>
+            <span>Buy Membership</span>
           </button>
-        </>  :
-        <button className="" onClick={handleStripePurchase}>
-          <span>Buy Membership</span>
-        </button>
-      }
+        }
       </div>
       
       
