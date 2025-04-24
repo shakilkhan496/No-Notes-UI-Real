@@ -8,6 +8,7 @@ export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
+    const [subscriptionState,setSubscriptionState]=useState(null);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -35,7 +36,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, signIn, signOutUser }}>
+        <AuthContext.Provider value={{ user, signIn, signOutUser,subscriptionState, setSubscriptionState}}>
             {children}
         </AuthContext.Provider>
     );
